@@ -161,7 +161,10 @@ struct proxy* get_conf_info(int *proxyNum)
         {
             if(*proxyNum == proxyInfoLen)
             {
+                struct proxy *delete = proxyInfo;
                 proxyInfo = new_proxy(proxyInfo,&proxyInfoLen,*proxyNum);
+                free(delete);
+                delete = NULL;
             }
             block_read(file,proxyNum,&ch,proxyInfo);
         }

@@ -14,7 +14,8 @@ int create_listenfd(int listenPort){
 
     int res = bind(listenfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if(res == -1){
-        perror("bind error\n");
+        printf("%d bind error\n",listenPort);
+        exit(1);
     }
     listen(listenfd,128);
     return listenfd;
