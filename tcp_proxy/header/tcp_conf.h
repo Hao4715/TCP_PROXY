@@ -12,8 +12,8 @@ struct proxy
     int server_port;
 };
 
-struct proxy* get_conf_info(int *proxyNum);
-void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo);
-struct proxy * new_proxy(struct proxy* oldProxyInfo,int *proxyNum,int blockNum);
+struct proxy* get_conf_info(int *proxy_num);
+void block_read(FILE *file, int *block_num,int *ch,struct proxy *proxy_info);
+struct proxy * new_proxy(struct proxy* old_proxy_info,int *proxy_num,int block_num);
 int is_ip_legal(char *ip,int len);
 #endif

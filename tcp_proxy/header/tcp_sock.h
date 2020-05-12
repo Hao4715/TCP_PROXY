@@ -13,6 +13,6 @@
 #include <time.h>
 
 
-int create_listenfd(int listenPort);
+int create_listenfd(int listen_port);
 
 #endif

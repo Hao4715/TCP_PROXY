@@ -34,7 +34,7 @@ int is_ip_legal(char *ip,int len)
     return 1;
 }
 
-void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
+void block_read(FILE *file, int *block_num,int *ch,struct proxy *proxy_info)
 {
     int i=0,len,i_ip;
     struct pattern pat[18] = {{"proxy",5},{"{",1},{"listen",6},{"{",1},{"port",4},{"",0},{";",1},{"}",1},{"server",6},{"{",1},{"ip",2},{"",0},{";",1},{"port",4},{"",0},{";",1},{"}",1},{"}",1}};
@@ -56,10 +56,10 @@ void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
                     case 5:
                         while((*ch - '0') >=0 && (*ch - '0') <= 9)
                         {
-                            proxyInfo[*blockNum].listen_port  = proxyInfo[*blockNum].listen_port * 10 + (*ch -'0');
-                            if(proxyInfo[*blockNum].listen_port > 65535)
+                            proxy_info[*block_num].listen_port  = proxy_info[*block_num].listen_port * 10 + (*ch -'0');
+                            if(proxy_info[*block_num].listen_port > 65535)
                             {
-                                printf("conf error in block:%d listen_port is to large!!\n",*blockNum + 1);
+                                printf("conf error in block:%d listen_port is to large!!\n",*block_num + 1);
                                 exit(1);
                             }
                             *ch = fgetc(file);
@@ -71,14 +71,14 @@ void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
                         i_ip = 0;
                         while(( (*ch -'0') >= 0 && (*ch - '0') <= 9) || *ch == '.')
                         {
-                            proxyInfo[*blockNum].server_ip[i_ip] = *ch;
+                            proxy_info[*block_num].server_ip[i_ip] = *ch;
                             *ch = fgetc(file);
                             i_ip++;
                         }
-                        proxyInfo[*blockNum].server_ip[i_ip] = '\n';
-                        if( is_ip_legal(proxyInfo[*blockNum].server_ip,i_ip+1) == 0)
+                        proxy_info[*block_num].server_ip[i_ip] = '\n';
+                        if( is_ip_legal(proxy_info[*block_num].server_ip,i_ip+1) == 0)
                         {
-                            printf("conf error in block:%d server_ip is illegal!!\n",*blockNum+1);
+                            printf("conf error in block:%d server_ip is illegal!!\n",*block_num+1);
                             exit(1);
                         }
                         //printf("server_ip : %s",proxyInfo[*blockNum].server_ip);
@@ -87,10 +87,10 @@ void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
                     case 14:
                         while ((*ch - '0') >= 0 && (*ch - '0') <= 9)
                         {
-                            proxyInfo[*blockNum].server_port = proxyInfo[*blockNum].server_port * 10 + (*ch - '0');
-                            if (proxyInfo[*blockNum].server_port > 65535)
+                            proxy_info[*block_num].server_port = proxy_info[*block_num].server_port * 10 + (*ch - '0');
+                            if (proxy_info[*block_num].server_port > 65535)
                             {
-                                printf("conf error in block:%d server_port is to large!!\n", *blockNum +1);
+                                printf("conf error in block:%d server_port is to large!!\n", *block_num +1);
                                 exit(1);
                             }
                             *ch = fgetc(file);
@@ -106,9 +106,9 @@ void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
                             if (*ch != pat[i].str[len])
                             {
                                 if( i == 6 || i == 12 || i == 15)
-                                    printf("conf file error in block:%d around word:%s\n", *blockNum+1, pat[i-2].str);
+                                    printf("conf file error in block:%d around word:%s\n", *block_num+1, pat[i-2].str);
                                 else 
-                                    printf("conf file error in block:%d around word:%s\n", *blockNum+1, pat[i].str);
+                                    printf("conf file error in block:%d around word:%s\n", *block_num+1, pat[i].str);
                                 exit(1);
                             }
                             len++;
@@ -121,32 +121,32 @@ void block_read(FILE *file, int *blockNum,int *ch,struct proxy *proxyInfo)
                 break;
         }
     }
-    *blockNum += 1;
+    *block_num += 1;
     return;
 }
 
-struct proxy * new_proxy(struct proxy* oldProxyInfo,int *proxyNum,int blockNum)
+struct proxy * new_proxy(struct proxy* old_proxy_info,int *proxy_num,int block_num)
 {
-    *proxyNum += proxy_nums_add;
-    struct proxy * newProxyInfo = (struct proxy*)malloc(sizeof(struct proxy) * (*proxyNum));
-    memset(newProxyInfo,0,sizeof(struct proxy) * (*proxyNum));
+    *proxy_num += proxy_nums_add;
+    struct proxy * new_proxy_info = (struct proxy*)malloc(sizeof(struct proxy) * (*proxy_num));
+    memset(new_proxy_info,0,sizeof(struct proxy) * (*proxy_num));
     int i;
-    for(i=0;i<blockNum;i++)
+    for(i=0;i<block_num;i++)
     {
-        newProxyInfo[i].listen_port = oldProxyInfo[i].listen_port;
-        newProxyInfo[i].server_port = newProxyInfo[i].server_port;
-        strcpy(newProxyInfo[i].server_ip,oldProxyInfo[i].server_ip);
+        new_proxy_info[i].listen_port = old_proxy_info[i].listen_port;
+        new_proxy_info[i].server_port = new_proxy_info[i].server_port;
+        strcpy(new_proxy_info[i].server_ip,old_proxy_info[i].server_ip);
     }
-    return newProxyInfo;
+    return new_proxy_info;
 }
 
-struct proxy* get_conf_info(int *proxyNum)
+struct proxy* get_conf_info(int *proxy_num)
 {
     FILE *file = fopen("tcp_proxy.conf","r");
     int ch,i;
-    int proxyInfoLen = proxy_nums;
-    struct proxy *proxyInfo = (struct proxy *)malloc(sizeof(struct proxy)*proxy_nums);
-    memset(proxyInfo,0,sizeof(struct proxy)*proxy_nums);
+    int proxy_info_len = proxy_nums;
+    struct proxy *proxy_info = (struct proxy *)malloc(sizeof(struct proxy)*proxy_nums);
+    memset(proxy_info,0,sizeof(struct proxy)*proxy_nums);
     while((ch = fgetc(file)) != EOF)
     {
         if(ch == '#')
@@ -159,14 +159,14 @@ struct proxy* get_conf_info(int *proxyNum)
         }
         else
         {
-            if(*proxyNum == proxyInfoLen)
+            if(*proxy_num == proxy_info_len)
             {
-                struct proxy *delete = proxyInfo;
-                proxyInfo = new_proxy(proxyInfo,&proxyInfoLen,*proxyNum);
+                struct proxy *delete = proxy_info;
+                proxy_info = new_proxy(proxy_info,&proxy_info_len,*proxy_num);
                 free(delete);
                 delete = NULL;
             }
-            block_read(file,proxyNum,&ch,proxyInfo);
+            block_read(file,proxy_num,&ch,proxy_info);
         }
     }
     // for(i=0;i<*proxyNum;i++)
@@ -174,5 +174,5 @@ struct proxy* get_conf_info(int *proxyNum)
     //     printf("proxy %d : \n     port:%d ;  ip:%s ; port:%d;\n",i,proxyInfo[i].listen_port,proxyInfo[i].server_ip,proxyInfo[i].server_port);
     // }
     fclose(file);
-    return proxyInfo;
+    return proxy_info;
 }

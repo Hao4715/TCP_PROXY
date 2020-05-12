@@ -13,6 +13,6 @@
 #include <pthread.h>
 
 
-void proxy_process(int listenPort, char *serverIp, int serverPort,int accessLog);
+void proxy_process(int listen_port, char *server_ip, int server_port,int access_log);
 void *handle_request(void *arg);
 #endif
