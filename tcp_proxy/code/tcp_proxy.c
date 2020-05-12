@@ -2,84 +2,84 @@
 
 struct request_info
 {
-    int clientFd;
+    int client_fd;
 
-    time_t openTime;
-    time_t closeTime;
-    time_t connTime;
+    time_t open_time;
+    time_t close_time;
+    time_t conn_time;
 
-    char clientIp[16];
-    int clientPort;
-    int listenPort;
-    char serverIp[16];
-    int serverPort;
+    char client_ip[16];
+    int client_port;
+    int listen_port;
+    char server_ip[16];
+    int server_port;
 
-    int accessLog;
+    int access_log;
 };
 
-void proxy_process(int listenPort, char *serverIp, int serverPort,int accessLog)
+void proxy_process(int listen_port, char *server_ip, int server_port,int access_log)
 {
-    int listenFd;
+    int listen_fd;
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
     int res,nready,i,len,flag;
     pthread_t th;
     
 
-    listenFd = create_listenfd(listenPort);
+    listen_fd = create_listenfd(listen_port);
 
-    printf("listenFd:%d\n",listenFd);
+    printf("listenFd:%d\n",listen_fd);
     int num=0;
     while(1){
         num++;
-        struct request_info *requestInfo = (struct request_info*)malloc(sizeof(struct request_info));
+        struct request_info *request_info = (struct request_info*)malloc(sizeof(struct request_info));
         printf("%d process waiting for %d connection.....\n",getpid(),num);
-        int clientFd = accept(listenFd,(struct sockaddr *)&client_addr, &client_addr_len);
+        int client_fd = accept(listen_fd,(struct sockaddr *)&client_addr, &client_addr_len);
         
-        requestInfo->openTime = time(NULL);
-        requestInfo->clientFd = clientFd;
+        request_info->open_time = time(NULL);
+        request_info->client_fd = client_fd;
 
-        strcpy(requestInfo->serverIp, serverIp);
-        requestInfo->serverPort = serverPort;
-        requestInfo->listenPort = listenPort;
-        inet_ntop(AF_INET,&client_addr.sin_addr,requestInfo->clientIp, sizeof(requestInfo->clientIp));
-        requestInfo->clientPort = client_addr.sin_port;
+        strcpy(request_info->server_ip, server_ip);
+        request_info->server_port = server_port;
+        request_info->listen_port = listen_port;
+        inet_ntop(AF_INET,&client_addr.sin_addr,request_info->client_ip, sizeof(request_info->client_ip));
+        request_info->client_port = client_addr.sin_port;
 
-        requestInfo->accessLog = accessLog;
+        request_info->access_log = access_log;
 
         printf("this is %d client ...\n",num);
-        int res = pthread_create(&th, NULL, handle_request, (void *)requestInfo);
+        int res = pthread_create(&th, NULL, handle_request, (void *)request_info);
     }
-    close(listenFd);
+    close(listen_fd);
 }
 
 void *handle_request(void *arg){
-    char *logFormat = "%s - - [ %s ] \"%s\" [%s:%d]--[%s:%d]--[%s:%d] request_length:%d  response_length:%d\n";
+    char *log_format = "%s - - [ %s ] \"%s\" [%s:%d]--[%s:%d]--[%s:%d] request_length:%d  response_length:%d\n";
     char log[1024];
-    struct request_info *requestInfo = (struct request_info*)arg;
+    struct request_info *request_info = (struct request_info*)arg;
     int request_len,len,response_len=0;
-    char bufferRequest[1024],bufferResponse[1024];
+    char buffer_request[1024],buffer_response[1024];
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in server_addr;
     
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(requestInfo->serverPort);
-    server_addr.sin_addr.s_addr = inet_addr(requestInfo->serverIp);
+    server_addr.sin_port = htons(request_info->server_port);
+    server_addr.sin_addr.s_addr = inet_addr(request_info->server_ip);
     if( connect(server_fd, (struct sockaddr*)&server_addr,sizeof(server_addr)) < 0){
         printf("connect error\n");
         exit(0);
     }
 
 
-    request_len = recv(requestInfo->clientFd,bufferRequest,sizeof(bufferRequest),0);
+    request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
     if(request_len != 0)
     {
-        printf("read:%s", bufferRequest);
-        send(server_fd, bufferRequest, sizeof(bufferRequest), 0);
-        while ((len = recv(server_fd, bufferResponse, sizeof(bufferResponse), 0)) > 0)
+        printf("read:%s", buffer_request);
+        send(server_fd, buffer_request, sizeof(buffer_request), 0);
+        while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
         {
             response_len += len;
-            send(requestInfo->clientFd, bufferResponse, len, 0);
+            send(request_info->client_fd, buffer_response, len, 0);
         }
         printf("over........\n");
     }
@@ -87,7 +87,7 @@ void *handle_request(void *arg){
 
     char buf[64];
     memset(buf,0,sizeof(buf));
-    if(flock(requestInfo->accessLog,LOCK_EX) < 0)
+    if(flock(request_info->access_log,LOCK_EX) < 0)
     {
         printf("lockerrorrrrrrrr\n");
         exit(0);
@@ -102,10 +102,10 @@ void *handle_request(void *arg){
     sprintf(buf,"%d",sum);
     lseek(requestInfo->accessLog,0,SEEK_SET);*/
 
-    sprintf(log,logFormat,"192.168.1.5",ctime(&requestInfo->openTime),bufferRequest,requestInfo->clientIp,requestInfo->clientPort,"192.168.1.5",requestInfo->listenPort
-                ,requestInfo->serverIp,requestInfo->serverPort,request_len,response_len);
-    write(requestInfo->accessLog,log,strlen(log));
-    int ret = flock(requestInfo->accessLog,LOCK_UN);
+    sprintf(log,log_format,"192.168.1.5",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.5",request_info->listen_port
+                ,request_info->server_ip,request_info->server_port,request_len,response_len);
+    write(request_info->access_log,log,strlen(log));
+    int ret = flock(request_info->access_log,LOCK_UN);
     if(ret == -1)
     {
         printf("unlockerror\n");
@@ -115,11 +115,11 @@ void *handle_request(void *arg){
     
 
     close(server_fd);
-    close(requestInfo->clientFd);
-    requestInfo->closeTime = time(NULL);
-    requestInfo->connTime = requestInfo->closeTime - requestInfo->openTime;
-    printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",requestInfo->clientIp,requestInfo->clientPort,requestInfo->serverIp,requestInfo->serverPort);
-    printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",requestInfo->openTime, requestInfo->closeTime, requestInfo->connTime);
-    free(requestInfo);
+    close(request_info->client_fd);
+    request_info->close_time = time(NULL);
+    request_info->conn_time = request_info->close_time - request_info->open_time;
+    printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",request_info->client_ip,request_info->client_port,request_info->server_ip,request_info->server_port);
+    printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",request_info->open_time, request_info->close_time, request_info->conn_time);
+    free(request_info);
     pthread_exit(NULL);
 }

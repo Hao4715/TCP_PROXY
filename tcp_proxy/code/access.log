@@ -1,9 +1,24 @@
-192.168.1.5 - - [ Fri May  8 16:14:39 2020
- ] "GET /files1/6m.jpg HTTP/1.0
-Connection: Keep-Alive
-Host: 192.168.1.5:8333
-User-Agent: ApacheBench/2.3
-Accept: */*
-
-" [192.168.1.9:40100]--[192.168.1.5:8333]--[192.168.1.5
-:8111] request_length:121  response_length:6538282
+192.168.1.5 - - [ Mon May 11 20:18:08 2020
+ ] "GET /files1/49B.txt
+" [192.168.1.9:36588]--[192.168.1.5:8333]--[192.168.1.11
+:8111] request_length:20  response_length:49
+192.168.1.5 - - [ Mon May 11 20:19:33 2020
+ ] "GET /files1/700m.mkv
+" [192.168.1.9:37100]--[192.168.1.5:8333]--[192.168.1.11
+:8111] request_length:21  response_length:734230649
+192.168.1.5 - - [ Mon May 11 20:25:40 2020
+ ] "GET /files1/08.mkv
+" [192.168.1.9:27792]--[192.168.1.5:8444]--[192.168.1.11
+:8222] request_length:19  response_length:153
+192.168.1.5 - - [ Mon May 11 20:26:27 2020
+ ] "GET /files1/08.mkv
+" [192.168.1.9:28304]--[192.168.1.5:8444]--[192.168.1.11
+:8222] request_length:19  response_length:153
+192.168.1.5 - - [ Mon May 11 20:29:38 2020
+ ] "GET /files1//files2/08.mkv
+" [192.168.1.9:28816]--[192.168.1.5:8444]--[192.168.1.11
+:8222] request_length:27  response_length:153
+192.168.1.5 - - [ Mon May 11 20:32:01 2020
+ ] "GET /files2/08.mkv
+" [192.168.1.9:29328]--[192.168.1.5:8444]--[192.168.1.11
+:8222] request_length:19  response_length:729284061

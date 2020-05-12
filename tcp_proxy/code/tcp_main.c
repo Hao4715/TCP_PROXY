@@ -6,16 +6,16 @@
 
 
 int main(){ 
-    int i,proxyNum=0;
-    struct proxy* proxyInfo = get_conf_info(&proxyNum);
-    int pid[proxyNum];
+    int i,proxy_num=0;
+    struct proxy* proxy_info = get_conf_info(&proxy_num);
+    int pid[proxy_num];
     int accessLog = open("access.log",O_RDWR | O_APPEND);
-    for (i = 0; i < proxyNum; i++)
+    for (i = 0; i < proxy_num; i++)
     {
-        printf("proxy %d : \n     port:%d ;  ip:%s ; port:%d;\n",i,proxyInfo[i].listen_port,proxyInfo[i].server_ip,proxyInfo[i].server_port);
+        printf("proxy %d : \n     port:%d ;  ip:%s ; port:%d;\n",i,proxy_info[i].listen_port,proxy_info[i].server_ip,proxy_info[i].server_port);
         if((pid[i] = fork()) == 0)
         {
-            proxy_process(proxyInfo[i].listen_port,proxyInfo[i].server_ip,proxyInfo[i].server_port,accessLog);
+            proxy_process(proxy_info[i].listen_port,proxy_info[i].server_ip,proxy_info[i].server_port,accessLog);
             exit(1);
         }
     }
