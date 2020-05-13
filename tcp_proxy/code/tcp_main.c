@@ -4,6 +4,16 @@
 #include "../header/tcp_proxy.h"
 #include "../header/tcp_conf.h"
 
+struct statistics_info
+{
+    unsigned int connections_per_seconds;
+    unsigned int  connections_all;
+    unsigned int  connections_finished;
+
+    unsigned long data_all;
+    unsigned long data_client;
+    unsigned long data_server;
+};
 
 int main(){ 
     int i,proxy_num=0;
