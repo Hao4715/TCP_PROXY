@@ -15,6 +15,7 @@ struct request_info
     int server_port;
 
     int access_log;
+    struct statistics *statistics_info;
 };
 
 void proxy_process(int listen_port, char *server_ip, int server_port,int access_log,struct statistics *statistics_info)
@@ -33,9 +34,17 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
     while(1){
         num++;
         struct request_info *request_info = (struct request_info*)malloc(sizeof(struct request_info));
-        printf("%d process waiting for %d connection.....\n",getpid(),num);
+        //printf("%d process waiting for %d connection.....\n",getpid(),num);
         int client_fd = accept(listen_fd,(struct sockaddr *)&client_addr, &client_addr_len);
         
+        request_info->statistics_info = statistics_info;
+        
+        pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_mutex));
+        statistics_info->client_proxy_CPS++;
+        statistics_info->client_proxy_connections_now++;
+        pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_mutex));
+        
+
         request_info->open_time = time(NULL);
         request_info->client_fd = client_fd;
 
@@ -47,8 +56,9 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
 
         request_info->access_log = access_log;
 
-        printf("this is %d client ...\n",num);
+        //printf("this is %d client ...\n",num);
         int res = pthread_create(&th, NULL, handle_request, (void *)request_info);
+        pthread_detach(th);
     }
     close(listen_fd);
 }
@@ -70,18 +80,38 @@ void *handle_request(void *arg){
         exit(0);
     }
 
+    pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_mutex));
+    request_info->statistics_info->proxy_server_CPS++;
+    request_info->statistics_info->proxy_server_connections_now++;
+    pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_mutex));
+
 
     request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
+    //printf("len:%d\n\n",request_len);
     if(request_len != 0)
     {
+
         //printf("read:%s", buffer_request);
         send(server_fd, buffer_request, sizeof(buffer_request), 0);
+
+        pthread_mutex_lock(&(request_info->statistics_info->request_data_mutex));
+        request_info->statistics_info->client_to_proxy_data += request_len;
+        request_info->statistics_info->proxy_to_server_data += request_len;
+        pthread_mutex_unlock(&(request_info->statistics_info->request_data_mutex));
+
+
         while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
         {
             response_len += len;
             send(request_info->client_fd, buffer_response, len, 0);
+
+            pthread_mutex_lock(&(request_info->statistics_info->response_data_mutex));
+            request_info->statistics_info->proxy_to_client_data += len;
+            request_info->statistics_info->server_to_proxy_data += len;
+            pthread_mutex_unlock(&(request_info->statistics_info->response_data_mutex));
+
         }
-        printf("over........\n");
+        //printf("over........\n");
     }
     //printf("server:%s",buffer);
 
@@ -120,6 +150,12 @@ void *handle_request(void *arg){
     request_info->conn_time = request_info->close_time - request_info->open_time;
     //printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",request_info->client_ip,request_info->client_port,request_info->server_ip,request_info->server_port);
     //printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",request_info->open_time, request_info->close_time, request_info->conn_time);
+    
+    pthread_mutex_lock(&(request_info->statistics_info->connections_finished_mutex));
+    request_info->statistics_info->client_proxy_connections_finished++;
+    request_info->statistics_info->proxy_server_connections_finished++;
+    pthread_mutex_unlock(&(request_info->statistics_info->connections_finished_mutex));
+
     free(request_info);
     pthread_exit(NULL);
 }

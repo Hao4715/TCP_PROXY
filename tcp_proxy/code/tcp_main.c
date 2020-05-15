@@ -6,7 +6,6 @@
 #include "../header/tcp_statistics.h"
 
 
-
 int main(){ 
     int i,proxy_num=0;
     struct proxy* proxy_info = get_conf_info(&proxy_num);
@@ -25,9 +24,11 @@ int main(){
         if((pid[i] = fork()) == 0)
         {
             proxy_process(proxy_info[i].listen_port,proxy_info[i].server_ip,proxy_info[i].server_port,accessLog,statistics_info);
+            printf("tuichule:%d\n",getpid());
             exit(1);
         }
     }
+    sleep(1000);
     int state;
     wait(&state);
     printf("over\n");
