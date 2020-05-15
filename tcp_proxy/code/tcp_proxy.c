@@ -17,7 +17,7 @@ struct request_info
     int access_log;
 };
 
-void proxy_process(int listen_port, char *server_ip, int server_port,int access_log)
+void proxy_process(int listen_port, char *server_ip, int server_port,int access_log,struct statistics *statistics_info)
 {
     int listen_fd;
     struct sockaddr_in client_addr;
@@ -74,7 +74,7 @@ void *handle_request(void *arg){
     request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
     if(request_len != 0)
     {
-        printf("read:%s", buffer_request);
+        //printf("read:%s", buffer_request);
         send(server_fd, buffer_request, sizeof(buffer_request), 0);
         while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
         {
@@ -118,8 +118,8 @@ void *handle_request(void *arg){
     close(request_info->client_fd);
     request_info->close_time = time(NULL);
     request_info->conn_time = request_info->close_time - request_info->open_time;
-    printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",request_info->client_ip,request_info->client_port,request_info->server_ip,request_info->server_port);
-    printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",request_info->open_time, request_info->close_time, request_info->conn_time);
+    //printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",request_info->client_ip,request_info->client_port,request_info->server_ip,request_info->server_port);
+    //printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",request_info->open_time, request_info->close_time, request_info->conn_time);
     free(request_info);
     pthread_exit(NULL);
 }

@@ -11,8 +11,9 @@
 #include <strings.h>
 #include <string.h>
 #include <pthread.h>
+#include "../header/tcp_statistics.h"
 
 
-void proxy_process(int listen_port, char *server_ip, int server_port,int access_log);
+void proxy_process(int listen_port, char *server_ip, int server_port,int access_log,struct statistics * statistics_info);
 void *handle_request(void *arg);
 #endif
