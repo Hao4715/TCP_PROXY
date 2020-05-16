@@ -1,23 +1,29 @@
+/*
+* @brief     进程函数，逻辑主体
+* @details   包含代理进程函数以及工作线程函数
+*/
 #include "../header/tcp_proxy.h"
 
-struct request_info
+struct request_info         //请求信息结构体
 {
-    int client_fd;
+    int client_fd;          //客户端监听描述符
 
-    time_t open_time;
-    time_t close_time;
-    time_t conn_time;
+    time_t open_time;       //客户端连接时间
+    time_t close_time;      //客户端关闭时间
+    time_t conn_time;       //连接持续时间
 
-    char client_ip[16];
-    int client_port;
-    int listen_port;
-    char server_ip[16];
-    int server_port;
+    char client_ip[16];     //客户端IP
+    int client_port;        //客户端端口
+    int listen_port;        //代理程序监听端口
+    char server_ip[16];     //服务器ip  
+    int server_port;        //服务器端口
 
-    int access_log;
-    struct statistics *statistics_info;
+    int access_log;         //日志文件
+    struct statistics *statistics_info;  //输出统计信息结构体
 };
 
+
+//代理程序进程函数
 void proxy_process(int listen_port, char *server_ip, int server_port,int access_log,struct statistics *statistics_info)
 {
     int listen_fd;
@@ -37,13 +43,19 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
         //printf("%d process waiting for %d connection.....\n",getpid(),num);
         int client_fd = accept(listen_fd,(struct sockaddr *)&client_addr, &client_addr_len);
         
+        //客户端请求信息初始化
         request_info->statistics_info = statistics_info;
         
+        //互斥访问客户端每秒连接数以及总连接数
         pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_mutex));
         statistics_info->client_proxy_CPS++;
-        statistics_info->client_proxy_connections_now++;
+        statistics_info->client_proxy_connections_all++;
         pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_mutex));
         
+        //互斥访问正在处理连接数
+        pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
+        request_info->statistics_info->client_proxy_connections_now++;
+        pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
 
         request_info->open_time = time(NULL);
         request_info->client_fd = client_fd;
@@ -63,6 +75,8 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
     close(listen_fd);
 }
 
+
+//线程处理函数
 void *handle_request(void *arg){
     char *log_format = "%s - - [ %s ] \"%s\" [%s:%d]--[%s:%d]--[%s:%d] request_length:%d  response_length:%d\n";
     char log[1024];
@@ -80,11 +94,16 @@ void *handle_request(void *arg){
         exit(0);
     }
 
+    //互斥访问代理程序与服务器每秒建立连接数以及总连接数
     pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_mutex));
     request_info->statistics_info->proxy_server_CPS++;
-    request_info->statistics_info->proxy_server_connections_now++;
+    request_info->statistics_info->proxy_server_connections_all++;
     pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_mutex));
 
+    //互斥访问正在处理的代理程序与服务器连接数
+    pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
+    request_info->statistics_info->proxy_server_connections_now++;
+    pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
 
     request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
     //printf("len:%d\n\n",request_len);
@@ -94,6 +113,7 @@ void *handle_request(void *arg){
         //printf("read:%s", buffer_request);
         send(server_fd, buffer_request, sizeof(buffer_request), 0);
 
+        //互斥更新传输数据量
         pthread_mutex_lock(&(request_info->statistics_info->request_data_mutex));
         request_info->statistics_info->client_to_proxy_data += request_len;
         request_info->statistics_info->proxy_to_server_data += request_len;
@@ -104,7 +124,7 @@ void *handle_request(void *arg){
         {
             response_len += len;
             send(request_info->client_fd, buffer_response, len, 0);
-
+            //互斥更新传输数据量
             pthread_mutex_lock(&(request_info->statistics_info->response_data_mutex));
             request_info->statistics_info->proxy_to_client_data += len;
             request_info->statistics_info->server_to_proxy_data += len;
@@ -122,15 +142,6 @@ void *handle_request(void *arg){
         printf("lockerrorrrrrrrr\n");
         exit(0);
     }
-    /*lseek(requestInfo->accessLog,0,SEEK_SET);
-    int l = read(requestInfo->accessLog,buf,sizeof(buf));
-    printf("read buf: %s\n",buf);
-    int i,sum=0;
-    buf[l] = '\0';
-    sum = atoi(buf);
-    ++sum;
-    sprintf(buf,"%d",sum);
-    lseek(requestInfo->accessLog,0,SEEK_SET);*/
 
     sprintf(log,log_format,"192.168.1.5",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.5",request_info->listen_port
                 ,request_info->server_ip,request_info->server_port,request_len,response_len);
@@ -151,10 +162,19 @@ void *handle_request(void *arg){
     //printf("sourceip: %s ; sourceport: %d\ndesip: %s ; desport: %d \n",request_info->client_ip,request_info->client_port,request_info->server_ip,request_info->server_port);
     //printf("opentime: %d ; closetime: %d ; conntime: %d ;\n",request_info->open_time, request_info->close_time, request_info->conn_time);
     
+    //互斥统计完成连接数
     pthread_mutex_lock(&(request_info->statistics_info->connections_finished_mutex));
     request_info->statistics_info->client_proxy_connections_finished++;
     request_info->statistics_info->proxy_server_connections_finished++;
     pthread_mutex_unlock(&(request_info->statistics_info->connections_finished_mutex));
+
+    pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
+    request_info->statistics_info->client_proxy_connections_now--;
+    pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
+
+    pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
+    request_info->statistics_info->proxy_server_connections_now--;
+    pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
 
     free(request_info);
     pthread_exit(NULL);

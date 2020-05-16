@@ -14,6 +14,9 @@ struct statistics
     unsigned int client_proxy_CPS;
     //pthread_mutex_t client_proxy_CPS_mutex;
     unsigned int client_proxy_connections_now;
+    pthread_mutex_t client_proxy_connections_now_mutex;
+
+    unsigned int client_proxy_connections_all;
     pthread_mutex_t client_proxy_connections_mutex;
 
     unsigned int client_proxy_connections_finished;
@@ -29,6 +32,9 @@ struct statistics
     unsigned int proxy_server_CPS;
     //pthread_mutex_t proxy_server_CPS_mutex;
     unsigned int proxy_server_connections_now;
+    pthread_mutex_t proxy_server_connections_now_mutex;
+
+    unsigned int proxy_server_connections_all;
     pthread_mutex_t proxy_server_connections_mutex;
 
     unsigned int proxy_server_connections_finished;

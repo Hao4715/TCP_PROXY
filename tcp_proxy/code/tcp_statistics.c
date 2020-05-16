@@ -10,12 +10,14 @@ struct statistics * statisticsInit()
 
     statistics_info->client_proxy_CPS = 0;
     statistics_info->client_proxy_connections_now = 0;
+    statistics_info->client_proxy_connections_all = 0;
     statistics_info->client_proxy_connections_finished = 0;
     statistics_info->client_to_proxy_data = 0;
     statistics_info->proxy_to_client_data = 0;
 
     statistics_info->proxy_server_CPS = 0;
     statistics_info->proxy_server_connections_now = 0;
+    statistics_info->proxy_server_connections_all = 0;
     statistics_info->proxy_server_connections_finished = 0;
     statistics_info->server_to_proxy_data = 0;
     statistics_info->proxy_to_server_data = 0;
@@ -27,6 +29,8 @@ struct statistics * statisticsInit()
     pthread_mutex_init(&(statistics_info->request_data_mutex),&(statistics_info->mutex_attr));
     pthread_mutex_init(&(statistics_info->response_data_mutex),&(statistics_info->mutex_attr));
     pthread_mutex_init(&(statistics_info->connections_finished_mutex),&(statistics_info->mutex_attr));
+    pthread_mutex_init(&(statistics_info->client_proxy_connections_now_mutex),&(statistics_info->mutex_attr));
+    pthread_mutex_init(&(statistics_info->proxy_server_connections_now_mutex),&(statistics_info->mutex_attr));
 
     return statistics_info;
 }
@@ -34,6 +38,7 @@ struct statistics * statisticsInit()
 void proxy_show_statisitcs(struct statistics *statistics_info)
 {
     int i = 0;
+    unsigned int count = 0;
     while (1)
     {
         if(i == 0)
