@@ -82,6 +82,7 @@ void print_tcp_header_info(struct tcphdr *tcpptr){
 	printf("Destination port: %d\n",ntohs(tcpptr->dest));//目的端口
 	printf("Seq: %u\n",ntohs(tcpptr->seq));//确认号
 	printf("Checksum: %#04x\n",tcpptr->check);//检验和
+	printf("state: %u\n",ntohs(tcpptr->seq));//检验和
 }
 
 //输出UDP头部信息
@@ -145,7 +146,7 @@ void printf_info(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *pa
             print_udp_header_info(udpptr);
             j += 20;
         }
-        else printf("\nThis packet didn't use TCP/UDP protocol.\n");
+        else printf("\nThis packet didn't use TCP/UDP protocol,%d.\n",ipptr->protocol);
     }
     else printf("\nThis packet didn't use IP protocol.\n");
 
@@ -159,14 +160,30 @@ int main()
     char errBuf[PCAP_ERRBUF_SIZE];
     char *device = "ens33";
     pcap_t *head;
-    int id;
+    struct bpf_program fp;
+    int id,res;
 
     head = pcap_open_live(device,65535,0,1000,errBuf);
+
+    //res = pcap_compile(head,&fp,"src or dst host 192.168.1.4",1,0);
+    res = pcap_compile(head,&fp,"tcp port 8999",1,0);
+    if(res != 0)
+    {
+        printf("pcap_compile error\n");
+        exit(1);
+    }
+    res = pcap_setfilter(head,&fp);
+    if(res != 0)
+    {
+        printf("pcap_setfilter error\n");
+        exit(1);
+    }
+
     if(head)
     {
         printf("open success\n");
         id = 0;
-        pcap_loop(head,1,printf_info,(u_char *)&id);
+        pcap_loop(head,-1,printf_info,(u_char *)&id);
     }
     else 
     {
