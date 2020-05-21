@@ -82,7 +82,11 @@ void print_tcp_header_info(struct tcphdr *tcpptr){
 	printf("Destination port: %d\n",ntohs(tcpptr->dest));//目的端口
 	printf("Seq: %u\n",ntohs(tcpptr->seq));//确认号
 	printf("Checksum: %#04x\n",tcpptr->check);//检验和
-	printf("state: %u\n",ntohs(tcpptr->seq));//检验和
+	printf("seq: %u\n",tcpptr->seq);//检验和
+	printf("syn: %u\n",tcpptr->syn);//检验和
+	printf("ack: %u\n",tcpptr->ack);//检验和
+	printf("fin: %u\n",tcpptr->fin);//检验和
+	//printf("ack: %u\n",ntohs(tcpptr->ack));//检验和
 }
 
 //输出UDP头部信息
@@ -98,9 +102,16 @@ void print_udp_header_info(struct udphdr *udpptr){
 void print_data_info(int j,const struct pcap_pkthdr *pkthdr,const u_char *packet){
 	int i;
 	printf("\nData:\n");
-	for(i=0;j<pkthdr->len;i++,j++){
-		printf(" %02x",packet[j]);
-		if((i+1)%16==0)
+    //char *str = packet;
+    //str = str + j;
+    //printf("%s\n",str);
+    //j += 13;
+    for(i=0;j<pkthdr->len;i++,j++){
+		printf("%c",packet[j]);
+		//printf(" %c",(char)packet[j]);
+		//printf("%d\n",sizeof(packet[j]));
+        //sleep(100);
+        if((i+1)%16==0)
 			printf("\n");
 	}
 	printf("\n");
@@ -130,14 +141,16 @@ void printf_info(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *pa
         ipptr = (struct iphdr *)(packet + sizeof(struct ether_header));
         print_ip_header_info(ipptr);
 
-        j += ipptr->ihl;
+        j += ipptr->ihl*4;
 
         if(ipptr->protocol == 6)
         {
             //获取tcp数据包
             tcpptr = (struct tcphdr *)(packet + sizeof(struct ether_header) + sizeof(struct iphdr));
+            printf("+++%u\n",tcpptr->doff);
             print_tcp_header_info(tcpptr);
             j += 20;
+            j += (tcpptr->doff -5)*4;
         } 
         else if(ipptr->protocol == 17)
         {
@@ -152,6 +165,7 @@ void printf_info(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *pa
 
     print_data_info(j,pkthdr,packet);
     printf("\n\n");
+    printf("***************************************%d*******************************************\n",*id);
 }
 
 

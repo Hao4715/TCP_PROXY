@@ -137,14 +137,15 @@ void *handle_request(void *arg){
 
     char buf[64];
     memset(buf,0,sizeof(buf));
+
+    sprintf(log,log_format,"192.168.1.5",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.5",request_info->listen_port
+                ,request_info->server_ip,request_info->server_port,request_len,response_len);
+    
     if(flock(request_info->access_log,LOCK_EX) < 0)
     {
         printf("lockerrorrrrrrrr\n");
         exit(0);
     }
-
-    sprintf(log,log_format,"192.168.1.5",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.5",request_info->listen_port
-                ,request_info->server_ip,request_info->server_port,request_len,response_len);
     write(request_info->access_log,log,strlen(log));
     int ret = flock(request_info->access_log,LOCK_UN);
     if(ret == -1)
