@@ -17,6 +17,6 @@ int create_listenfd(int listen_port){
         printf("%d bind error\n",listen_port);
         exit(1);
     }
-    listen(listenfd,128);
+    listen(listenfd,10000);
     return listenfd;
 }

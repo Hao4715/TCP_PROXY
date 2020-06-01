@@ -4,6 +4,9 @@
 */
 #include "../header/tcp_proxy.h"
 
+int test;
+pthread_mutex_t test_mutex;
+
 struct request_info         //请求信息结构体
 {
     int client_fd;          //客户端监听描述符
@@ -26,6 +29,9 @@ struct request_info         //请求信息结构体
 //代理程序进程函数
 void proxy_process(int listen_port, char *server_ip, int server_port,int access_log,struct statistics *statistics_info)
 {
+
+    pthread_mutex_init(&test_mutex,NULL);
+
     int listen_fd;
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
@@ -70,6 +76,10 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
 
         //printf("this is %d client ...\n",num);
         int res = pthread_create(&th, NULL, handle_request, (void *)request_info);
+        if(res != 0)
+        {
+            printf("thread error %s\n",strerror(res));
+        }
         pthread_detach(th);
     }
     close(listen_fd);
@@ -78,6 +88,12 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
 
 //线程处理函数
 void *handle_request(void *arg){
+    
+    // pthread_mutex_lock(&test_mutex);
+    // test++;
+    // printf("num:%d\n",test);
+    // pthread_mutex_unlock(&test_mutex);
+
     char *log_format = "%s - - [ %s ] \"%s\" [%s:%d]--[%s:%d]--[%s:%d] request_length:%d  response_length:%d\n";
     char log[1024];
     struct request_info *request_info = (struct request_info*)arg;
@@ -86,6 +102,18 @@ void *handle_request(void *arg){
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in server_addr;
     
+    request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
+    printf("len:%d\n\n",request_len);
+    if(request_len == 0)
+    {
+        pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
+        request_info->statistics_info->client_proxy_connections_now--;
+        pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
+        close(request_info->client_fd);
+        free(request_info);
+        pthread_exit(NULL);
+    }
+
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(request_info->server_port);
     server_addr.sin_addr.s_addr = inet_addr(request_info->server_ip);
@@ -93,6 +121,7 @@ void *handle_request(void *arg){
         printf("connect error\n");
         exit(0);
     }
+
 
     //互斥访问代理程序与服务器每秒建立连接数以及总连接数
     pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_mutex));
@@ -105,34 +134,30 @@ void *handle_request(void *arg){
     request_info->statistics_info->proxy_server_connections_now++;
     pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
 
-    request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
-    //printf("len:%d\n\n",request_len);
-    if(request_len != 0)
+    
+
+   
+    //printf("read:%s", buffer_request);
+    send(server_fd, buffer_request, sizeof(buffer_request), 0);
+
+    //互斥更新传输数据量
+    pthread_mutex_lock(&(request_info->statistics_info->request_data_mutex));
+    request_info->statistics_info->client_to_proxy_data += request_len;
+    request_info->statistics_info->proxy_to_server_data += request_len;
+    pthread_mutex_unlock(&(request_info->statistics_info->request_data_mutex));
+
+    while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
     {
-
-        //printf("read:%s", buffer_request);
-        send(server_fd, buffer_request, sizeof(buffer_request), 0);
-
+        response_len += len;
+        send(request_info->client_fd, buffer_response, len, 0);
         //互斥更新传输数据量
-        pthread_mutex_lock(&(request_info->statistics_info->request_data_mutex));
-        request_info->statistics_info->client_to_proxy_data += request_len;
-        request_info->statistics_info->proxy_to_server_data += request_len;
-        pthread_mutex_unlock(&(request_info->statistics_info->request_data_mutex));
-
-
-        while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
-        {
-            response_len += len;
-            send(request_info->client_fd, buffer_response, len, 0);
-            //互斥更新传输数据量
-            pthread_mutex_lock(&(request_info->statistics_info->response_data_mutex));
-            request_info->statistics_info->proxy_to_client_data += len;
-            request_info->statistics_info->server_to_proxy_data += len;
-            pthread_mutex_unlock(&(request_info->statistics_info->response_data_mutex));
-
-        }
-        //printf("over........\n");
+        pthread_mutex_lock(&(request_info->statistics_info->response_data_mutex));
+        request_info->statistics_info->proxy_to_client_data += len;
+        request_info->statistics_info->server_to_proxy_data += len;
+        pthread_mutex_unlock(&(request_info->statistics_info->response_data_mutex));
     }
+    //printf("over........\n");
+
     //printf("server:%s",buffer);
 
     char buf[64];
