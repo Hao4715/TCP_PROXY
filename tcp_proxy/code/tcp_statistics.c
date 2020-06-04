@@ -47,9 +47,9 @@ void proxy_show_statisitcs(struct statistics *statistics_info)
             printf(" 每秒新建连接数 | 当前并发连接数 |  已完成连接数  |       in       |       out      || 每秒新建连接数 | 当前并发连接数 |  已完成连接数  |       in       |       out\n");
         }
         printf("%-16u|%-16u|%-16u|%-16ld|%-16ld||%-16u|%-16u|%-16u|%-16ld|%-16ld \n",
-        statistics_info->client_proxy_connections_all, statistics_info->client_proxy_connections_now, statistics_info->client_proxy_connections_finished,
+        statistics_info->client_proxy_CPS, statistics_info->client_proxy_connections_now, statistics_info->client_proxy_connections_finished,
         statistics_info->client_to_proxy_data, statistics_info->proxy_to_client_data,
-        statistics_info->proxy_server_connections_all, statistics_info->proxy_server_connections_now, statistics_info->proxy_server_connections_finished,
+        statistics_info->proxy_server_CPS, statistics_info->proxy_server_connections_now, statistics_info->proxy_server_connections_finished,
         statistics_info->server_to_proxy_data, statistics_info->proxy_to_server_data);
         pthread_mutex_lock(&(statistics_info->client_proxy_connections_mutex));
         statistics_info->client_proxy_CPS = 0;

@@ -4,26 +4,9 @@
 */
 #include "../header/tcp_proxy.h"
 
-int test;
+// int test;
 pthread_mutex_t test_mutex;
-
-struct request_info         //请求信息结构体
-{
-    int client_fd;          //客户端监听描述符
-
-    time_t open_time;       //客户端连接时间
-    time_t close_time;      //客户端关闭时间
-    time_t conn_time;       //连接持续时间
-
-    char client_ip[16];     //客户端IP
-    int client_port;        //客户端端口
-    int listen_port;        //代理程序监听端口
-    char server_ip[16];     //服务器ip  
-    int server_port;        //服务器端口
-
-    int access_log;         //日志文件
-    struct statistics *statistics_info;  //输出统计信息结构体
-};
+// pthread_cond_t test_cond = PTHREAD_COND_INITIALIZER;
 
 
 //代理程序进程函数
@@ -31,6 +14,7 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
 {
 
     pthread_mutex_init(&test_mutex,NULL);
+    // pthread_cond_init(&test_cond,NULL);
 
     int listen_fd;
     struct sockaddr_in client_addr;
@@ -48,7 +32,8 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
         struct request_info *request_info = (struct request_info*)malloc(sizeof(struct request_info));
         //printf("%d process waiting for %d connection.....\n",getpid(),num);
         int client_fd = accept(listen_fd,(struct sockaddr *)&client_addr, &client_addr_len);
-        
+        if(client_fd == -1)
+            printf("accept error\n");
         //客户端请求信息初始化
         request_info->statistics_info = statistics_info;
         
@@ -75,53 +60,56 @@ void proxy_process(int listen_port, char *server_ip, int server_port,int access_
         request_info->access_log = access_log;
 
         //printf("this is %d client ...\n",num);
-        int res = pthread_create(&th, NULL, handle_request, (void *)request_info);
+        res = pthread_create(&th, NULL, handle_request, (void *)request_info);
         if(res != 0)
         {
             printf("thread error %s\n",strerror(res));
         }
-        pthread_detach(th);
+        //pthread_detach(th);
     }
     close(listen_fd);
 }
 
 
 //线程处理函数
-void *handle_request(void *arg){
-    
-    // pthread_mutex_lock(&test_mutex);
-    // test++;
-    // printf("num:%d\n",test);
-    // pthread_mutex_unlock(&test_mutex);
+void *handle_request(void *arg)
+{
+    pthread_detach(pthread_self());
+
 
     char *log_format = "%s - - [ %s ] \"%s\" [%s:%d]--[%s:%d]--[%s:%d] request_length:%d  response_length:%d\n";
-    char log[1024];
+    char log[512];
     struct request_info *request_info = (struct request_info*)arg;
-    int request_len,len,response_len=0;
+    int request_len=0,len,response_len=0;
     char buffer_request[1024],buffer_response[1024];
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int server_fd;
     struct sockaddr_in server_addr;
     
     request_len = recv(request_info->client_fd,buffer_request,sizeof(buffer_request),0);
-    printf("len:%d\n\n",request_len);
     if(request_len == 0)
     {
+        close(request_info->client_fd);
         pthread_mutex_lock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
         request_info->statistics_info->client_proxy_connections_now--;
         pthread_mutex_unlock(&(request_info->statistics_info->client_proxy_connections_now_mutex));
-        close(request_info->client_fd);
         free(request_info);
+        request_info = NULL;
         pthread_exit(NULL);
     }
-
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(server_fd == -1)
+        printf("socket to server error\n");
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(request_info->server_port);
     server_addr.sin_addr.s_addr = inet_addr(request_info->server_ip);
+    pthread_mutex_lock(&test_mutex);
     if( connect(server_fd, (struct sockaddr*)&server_addr,sizeof(server_addr)) < 0){
         printf("connect error\n");
-        exit(0);
     }
+    pthread_mutex_unlock(&test_mutex);
 
+
+    
 
     //互斥访问代理程序与服务器每秒建立连接数以及总连接数
     pthread_mutex_lock(&(request_info->statistics_info->proxy_server_connections_mutex));
@@ -135,35 +123,46 @@ void *handle_request(void *arg){
     pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
 
     
-
-   
+    
     //printf("read:%s", buffer_request);
-    send(server_fd, buffer_request, sizeof(buffer_request), 0);
-
+    int test_send = send(server_fd, buffer_request, request_len, 0);
+    //int test_send = send(server_fd, buffer_request, sizeof(buffer_request), 0);
+    if(test_send <= 0)
+        printf("send error\n");
     //互斥更新传输数据量
     pthread_mutex_lock(&(request_info->statistics_info->request_data_mutex));
     request_info->statistics_info->client_to_proxy_data += request_len;
     request_info->statistics_info->proxy_to_server_data += request_len;
     pthread_mutex_unlock(&(request_info->statistics_info->request_data_mutex));
 
+    //pthread_mutex_lock(&test_mutex);
+    //pthread_cond_signal(&test_cond);
+    //pthread_mutex_lock(&test_mutex);
+    //pthread_cond_wait(&test_cond,&test_mutex);
+    //pthread_mutex_unlock(&test_mutex);
+    // while(1)
+    // {}
     while ((len = recv(server_fd, buffer_response, sizeof(buffer_response), 0)) > 0)
     {
+        
         response_len += len;
-        send(request_info->client_fd, buffer_response, len, 0);
+        //send(request_info->client_fd, buffer_response, sizeof(response_len), 0);
+        if (send(request_info->client_fd, buffer_response, len, 0) <= 0)
+            printf("send to client error\n");
         //互斥更新传输数据量
         pthread_mutex_lock(&(request_info->statistics_info->response_data_mutex));
         request_info->statistics_info->proxy_to_client_data += len;
         request_info->statistics_info->server_to_proxy_data += len;
         pthread_mutex_unlock(&(request_info->statistics_info->response_data_mutex));
     }
-    //printf("over........\n");
+  
+    // pthread_mutex_lock(&test_mutex);
+    // test++;
+    // //if(test % 200 == 0)
+    // printf("num:%d\n",test);
+    // pthread_mutex_unlock(&test_mutex);
 
-    //printf("server:%s",buffer);
-
-    char buf[64];
-    memset(buf,0,sizeof(buf));
-
-    sprintf(log,log_format,"192.168.1.5",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.5",request_info->listen_port
+    sprintf(log,log_format,"192.168.1.11",ctime(&request_info->open_time),buffer_request,request_info->client_ip,request_info->client_port,"192.168.1.11",request_info->listen_port
                 ,request_info->server_ip,request_info->server_port,request_len,response_len);
     
     if(flock(request_info->access_log,LOCK_EX) < 0)
@@ -203,5 +202,6 @@ void *handle_request(void *arg){
     pthread_mutex_unlock(&(request_info->statistics_info->proxy_server_connections_now_mutex));
 
     free(request_info);
+    request_info = NULL;
     pthread_exit(NULL);
 }
