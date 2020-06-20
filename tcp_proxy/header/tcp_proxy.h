@@ -11,6 +11,9 @@
 #include <strings.h>
 #include <string.h>
 #include <pthread.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <errno.h>
 #include "tcp_statistics.h"
 
 struct request_info         //请求信息结构体

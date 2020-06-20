@@ -32,7 +32,6 @@ int main(){
             exit(1);
         }
     }
-    sleep(1000);
     int state;
     wait(&state);
     printf("over\n");

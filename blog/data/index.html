@@ -1,0 +1,766 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-8 col-xs-offset-4">
+				<button type="button" id="ping" class="btn btn-defalt">平假名</button>
+				<button type="button" id="pian" class="btn btn-defalt">片假名</button>
+				<button type="button" id="bei" class="btn btn-defalt">背诵模式</button>
+			</div>
+		</div>
+		<div class="row" id="wushiyin" style="display: block;">
+			<div class="col-xs-4">
+				<div class="row">
+					<img id="showimg" width="100%">
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="row">
+					<div class="col-xs-2 col-xs-offset-2">
+						<span class="ping">あ</span>
+						<span class="pian" style="display:none">ア</span>
+						<span> 段 </span>
+					</div>
+					<div class="col-xs-2">
+						<span class="ping">い</span>
+						<span class="pian" style="display:none">イ</span>
+						<span> 段 </span>
+					</div>
+					<div class="col-xs-2">
+						<span class="ping">う</span>
+						<span class="pian" style="display:none">ウ</span>
+						<span> 段 </span>
+					</div>
+					<div class="col-xs-2">
+						<span class="ping">え</span>
+						<span class="pian" style="display:none">エ</span>
+						<span> 段 </span>
+					</div>
+					<div class="col-xs-2">
+						<span class="ping">お</span>
+						<span class="pian" style="display:none">オ</span>
+						<span> 段 </span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">あ</span>
+						<span class="pian" style="display:none">ア</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">あ</span>
+							<span class="pian" style="display:none">ア</span>
+							<audio id="a_a" preload>
+								<source src="static/audio/a.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>a</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">い</span>
+							<span class="pian" style="display:none">イ</span>
+							<audio id="i_a" preload>
+								<source src="static/audio/i.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>i</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">う</span>
+							<span class="pian" style="display:none">ウ</span>
+							<audio id="u_a" preload>
+								<source src="static/audio/u.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>u</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">え</span>
+							<span class="pian" style="display:none">エ</span>
+							<audio id="e_a" preload>
+								<source src="static/audio/e.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>e</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">お</span>
+							<span class="pian" style="display:none">オ</span>
+							<audio id="o_a" preload>
+								<source src="static/audio/o.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>o</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">か</span>
+						<span class="pian" style="display:none">カ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">か</span>
+							<span class="pian" style="display:none">カ</span>
+							<audio id="ka_a" preload>
+								<source src="static/audio/ka.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ka</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">き</span>
+							<span class="pian" style="display:none">キ</span>
+							<audio id="ki_a" preload>
+								<source src="static/audio/ki.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ki</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">く</span>
+							<span class="pian" style="display:none">ク</span>
+							<audio id="ku_a" preload>
+								<source src="static/audio/ku.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ku</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">け</span>
+							<span class="pian" style="display:none">ケ</span>
+							<audio id="ke_a" preload>
+								<source src="static/audio/ke.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ke</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">こ</span>
+							<span class="pian" style="display:none">コ</span>
+							<audio id="ko_a" preload>
+								<source src="static/audio/ko.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ko</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">さ</span>
+						<span class="pian" style="display:none">サ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">さ</span>
+							<span class="pian" style="display:none">サ</span>
+							<audio id="sa_a" preload>
+								<source src="static/audio/sa.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>sa</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">し</span>
+							<span class="pian" style="display:none">シ</span>
+							<audio id="shi_a" preload>
+								<source src="static/audio/shi.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>shi</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">す</span>
+							<span class="pian" style="display:none">ス</span>
+							<audio id="su_a" preload>
+								<source src="static/audio/su.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>su</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">せ</span>
+							<span class="pian" style="display:none">セ</span>
+							<audio id="se_a" preload>
+								<source src="static/audio/se.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>se</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">そ</span>
+							<span class="pian" style="display:none">ソ</span>
+							<audio id="so_a" preload>
+								<source src="static/audio/so.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>so</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">た</span>
+						<span class="pian" style="display:none">タ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">た</span>
+							<span class="pian" style="display:none">タ</span>
+							<audio id="ta_a" preload>
+								<source src="static/audio/ta.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ta</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ち</span>
+							<span class="pian" style="display:none">チ</span>
+							<audio id="chi_a" preload>
+								<source src="static/audio/chi.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>chi</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">つ</span>
+							<span class="pian" style="display:none">ツ</span>
+							<audio id="tsu_a" preload>
+								<source src="static/audio/tsu.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>tsu</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">て</span>
+							<span class="pian" style="display:none">テ</span>
+							<audio id="te_a" preload>
+								<source src="static/audio/te.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>te</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">と</span>
+							<span class="pian" style="display:none">ト</span>
+							<audio id="to_a" preload>
+								<source src="static/audio/to.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>to</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">な</span>
+						<span class="pian" style="display:none">ナ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">な</span>
+							<span class="pian" style="display:none">ナ</span>
+							<audio id="na_a" preload>
+								<source src="static/audio/na.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>na</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">に</span>
+							<span class="pian" style="display:none">ニ</span>
+							<audio id="ni_a" preload>
+								<source src="static/audio/ni.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ni</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ぬ</span>
+							<span class="pian" style="display:none">ヌ</span>
+							<audio id="nu_a" preload>
+								<source src="static/audio/nu.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>nu</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ね</span>
+							<span class="pian" style="display:none">ネ</span>
+							<audio id="ne_a" preload>
+								<source src="static/audio/ne.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ne</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">の</span>
+							<span class="pian" style="display:none">ノ</span>
+							<audio id="no_a" preload>
+								<source src="static/audio/no.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>no</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">は</span>
+						<span class="pian" style="display:none">ハ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">は</span>
+							<span class="pian" style="display:none">ハ</span>
+							<audio id="ha_a" preload>
+								<source src="static/audio/ha.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ha</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ひ</span>
+							<span class="pian" style="display:none">ヒ</span>
+							<audio id="hi_a" preload>
+								<source src="static/audio/hi.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>hi</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ふ</span>
+							<span class="pian" style="display:none">フ</span>
+							<audio id="fu_a" preload>
+								<source src="static/audio/fu.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>fu</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">へ</span>
+							<span class="pian" style="display:none">ヘ</span>
+							<audio id="he_a" preload>
+								<source src="static/audio/he.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>he</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ほ</span>
+							<span class="pian" style="display:none">ホ</span>
+							<audio id="ho_a" preload>
+								<source src="static/audio/ho.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ho</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">ま</span>
+						<span class="pian" style="display:none">マ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ま</span>
+							<span class="pian" style="display:none">マ</span>
+							<audio id="ma_a" preload>
+								<source src="static/audio/ma.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ma</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">み</span>
+							<span class="pian" style="display:none">ミ</span>
+							<audio id="mi_a" preload>
+								<source src="static/audio/mi.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>mi</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">む</span>
+							<span class="pian" style="display:none">ム</span>
+							<audio id="mu_a" preload>
+								<source src="static/audio/mu.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>mu</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">め</span>
+							<span class="pian" style="display:none">メ</span>
+							<audio id="me_a" preload>
+								<source src="static/audio/me.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>me</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">も</span>
+							<span class="pian" style="display:none">モ</span>
+							<audio id="mo_a" preload>
+								<source src="static/audio/mo.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>mo</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">や</span>
+						<span class="pian" style="display:none">ヤ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">や</span>
+							<span class="pian" style="display:none">ヤ</span>
+							<audio id="ya_a" preload>
+								<source src="static/audio/ya.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ya</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">い</span>
+							<span class="pian" style="display:none">イ</span>
+							<audio id="i_a" preload>
+								<source src="static/audio/i.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>i</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ゆ</span>
+							<span class="pian" style="display:none">ユ</span>
+							<audio id="yu_a" preload>
+								<source src="static/audio/yu.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>yu</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">え</span>
+							<span class="pian" style="display:none">エ</span>
+						</button>
+						<span>e</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">よ</span>
+							<span class="pian" style="display:none">ヨ</span>
+							<audio id="yo_a" preload>
+								<source src="static/audio/yo.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>yo</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">ら</span>
+						<span class="pian" style="display:none">ラ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ら</span>
+							<span class="pian" style="display:none">ラ</span>
+							<audio id="ra_a" preload>
+								<source src="static/audio/ra.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ra</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">り</span>
+							<span class="pian" style="display:none">リ</span>
+							<audio id="ri_a" preload>
+								<source src="static/audio/ri.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ri</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">る</span>
+							<span class="pian" style="display:none">ル</span>
+							<audio id="ru_a" preload>
+								<source src="static/audio/ru.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ru</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">れ</span>
+							<span class="pian" style="display:none">レ</span>
+							<audio id="re_a" preload>
+								<source src="static/audio/re.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>re</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ろ</span>
+							<span class="pian" style="display:none">ロ</span>
+							<audio id="ro_a" preload>
+								<source src="static/audio/ro.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>ro</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">わ</span>
+						<span class="pian" style="display:none">ワ</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">わ</span>
+							<span class="pian" style="display:none">ワ</span>
+							<audio id="wa_a" preload>
+								<source src="static/audio/wa.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>wa</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">い</span>
+							<span class="pian" style="display:none">イ</span>
+						</button>
+						<span>i</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">う</span>
+							<span class="pian" style="display:none">ウ</span>
+						</button>
+						<span>u</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">え</span>
+							<span class="pian" style="display:none">エ</span>
+						</button>
+						<span>e</span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">を</span>
+							<span class="pian" style="display:none">ヲ</span>
+							<audio id="wo_a" preload>
+								<source src="static/audio/wo.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>wo</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-2">
+						<span class="ping">ん</span>
+						<span class="pian" style="display:none">ン</span>
+						<span> 行 </span>
+					</div>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-defalu btn-lg audio">
+							<span class="ping">ん</span>
+							<span class="pian" style="display:none">ン</span>
+							<audio id="n_a" preload>
+								<source src="static/audio/n.mp3" type="audio/mpeg">
+								</source>
+							</audio>
+						</button>
+						<span>n</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" id="single" style="display: none;">
+			<div class="col-xs-4">
+				<div class="row">
+					<img id="singlePingShowImg" width="100%" style="display: block;">
+				</div>
+				<div class="row">
+					<img id="singlePianShowImg" width="100%" style="display: none;">
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="row">
+					<button type="button" class="btn btn-defalt btn-lg" id="singlePing"></button >
+					<button type="button" class="btn btn-defalt btn-lg" id="singlePian"></button >
+					<span id="singleRoma"></span>
+				</div>
+				<div class="row">
+					<button type="button" class="btn btn-defalt btn-lg" id="next">下一个</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+
+	<script type="text/javascript" src="static/jQuery/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		var ping = ['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'];
+		var pian = ['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'];
+		var roma = ['a','i','u','e','o','ka','ki','ku','ke','ko','sa','shi','su','se','so','ta','chi','tsu','te','to','na','ni','nu','ne','no','ha','hi','fu','he','ho','ma','mi','mu','me','mo','ya','yu','yo','ra','ri','ru','re','ro','wa','wo','n'];
+		$(".audio").each(function () {
+			$(this).bind("click", function () {
+				var player = document.getElementById($(this).next().text() + "_a");
+				$(this).children().each(function () {
+					if ($(this).css("display") == "inline") {
+						var str = "static/" + $(this).prop("class") + "_gif" + "/" + $(this).parent().next().text() + ".gif";
+						$("#showimg").prop("src", str);
+						$("#showimg").css("display", "block");
+					}
+				});
+				player.play();
+			})
+		});
+		$("#pian").click(function () {
+			$("#single").css("display","none");
+			$("#wushiyin").css("display", "block");
+			$(".ping").prop("style", "display:none");
+			$(".pian").prop("style", "display:inline");
+			$("#showimg").css("display", "none");
+		});
+		$("#ping").click(function () {
+			$("#single").css("display","none");
+			$("#wushiyin").css("display", "block");
+			$(".pian").prop("style", "display:none");
+			$(".ping").prop("style", "display:inline");
+			$("#showimg").css("display", "none");
+		});
+		$("#bei").click(function () {
+			$("#wushiyin").css("display", "none");
+			$("#single").css("display","block");
+			var rand = parseInt(Math.random() * 46);
+			var str = "static/ping_gif/" + roma[rand] + ".gif";
+			$("#singlePingShowImg").prop("src",str);
+			var str = "static/pian_gif/" + roma[rand] + ".gif";
+			$("#singlePianShowImg").prop("src",str);
+			$("#singlePing").text(ping[rand]);
+			$("#singlePian").text(pian[rand]);
+			$("#singleRoma").text(roma[rand]);
+		});
+		$("#singlePian").click(function(){
+			$("#singlePingShowImg").css("display","none");
+			$("#singlePianShowImg").css("display","block");
+			var player = document.getElementById($("#singlePian").next().text() + "_a");
+			player.play();
+		});
+		$("#singlePing").click(function(){
+			$("#singlePianShowImg").css("display","none");
+			$("#singlePingShowImg").css("display","block");
+			var player = document.getElementById($("#singlePing").next().next().text() + "_a");
+			player.play();
+		});
+		$("#next").click(function(){
+			var rand = parseInt(Math.random() * 46);
+			var str = "static/ping_gif/" + roma[rand] + ".gif";
+			$("#singlePingShowImg").prop("src",str);
+			var str = "static/pian_gif/" + roma[rand] + ".gif";
+			$("#singlePianShowImg").prop("src",str);
+			$("#singlePing").text(ping[rand]);
+			$("#singlePian").text(pian[rand]);
+			$("#singleRoma").text(roma[rand]);
+		});
+	</script>
+</body>
+</html>
